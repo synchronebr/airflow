@@ -57,7 +57,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ""
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
-    AIRFLOW__CORE__LOAD_EXAMPLES: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session"
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
@@ -66,15 +66,25 @@ x-airflow-common: &airflow-common
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
     # The following line can be used to set a custom config file, stored in the local config folder
     # If you want to use it, outcomment it and replace airflow.cfg with the name of your config file
     # AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
+    _PIP_ADDITIONAL_REQUIREMENTS: "pandas==2.2.2 psycopg2-binary==2.9.9 scipy==1.14.0 matplotlib==3.9.1 numpy==2.0.1 requests==2.32.3 scikit-learn==1.5.2 scikit-learn==1.5.2"
+    AIRFLOW_PROJ_DAGS_DIR: "../airflow-dags"
+    AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: 600
+    AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL: 600
+    AIRFLOW__SCHEDULER__SCHEDULER_IDLE_SLEEP_TIME: 5
+    AIRFLOW__CORE__MIN_SERIALIZED_DAG_UPDATE_INTERVAL: 600
+    AIRFLOW__CORE__MIN_SERIALIZED_DAG_FETCH_INTERVAL: 300
+    AIRFLOW__WEBSERVER__WORKERS: 2 # 2 * NUM_CPU_CORES + 1
+    AIRFLOW__WEBSERVER__WORKER_REFRESH_INTERVAL: 1800 # Restart workers every 30min instead of 30seconds
+    AIRFLOW__WEBSERVER__WEB_SERVER_WORKER_TIMEOUT: 300 #Kill workers if they don't start within 5min instead of 2min
+
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
-    - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
-    - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
-    - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - C:/Users/vitor/Projects/synchrone/airflow-dags/dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./config:/opt/airflow/config
+    - C:/Users/vitor/Projects/synchrone/airflow-dags/plugins:/opt/airflow/plugins
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on: &airflow-common-depends-on
     redis:
