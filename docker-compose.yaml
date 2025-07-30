@@ -127,6 +127,8 @@ services:
     command: webserver
     ports:
       - "8080:8080"
+    volumes:
+      - ./airflow.cfg:/opt/airflow/airflow.cfg
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
